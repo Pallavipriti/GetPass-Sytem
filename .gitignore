@@ -1,6 +1,3 @@
-# This is an example .gitignore file
-# Copy this to .gitignore and modify as needed
-
 # Backend specific
 backend/node_modules/
 backend/.env
@@ -15,6 +12,7 @@ frontend/build/
 
 # Root level
 .env
+.env*
 .env.local
 .DS_Store
 node_modules/
@@ -22,7 +20,7 @@ dist/
 build/
 coverage/
 
-# Keep these directories (they will be created with .gitkeep files)
+# Keep these directories
 !backend/uploads/.gitkeep
 !backend/logs/.gitkeep
 !frontend/public/uploads/.gitkeep
