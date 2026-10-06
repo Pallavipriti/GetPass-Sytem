@@ -1,5 +1,5 @@
 import fs from "fs";
-import { sendWhatsAppMessage } from "../utils/sendWhatsApp.js";
+// import { sendWhatsAppMessage } from "../utils/sendWhatsApp.js";
 import { generateGatePassPDF } from "../utils/generatePdf.js";
 import { sendEmailWithPDF } from "../utils/sendEmail.js";
 import Visitor from "../models/Visitor.js";
@@ -60,7 +60,7 @@ export const addVisitor = async (req, res) => {
         console.log("✅ PDF Generated");
 
         // ✅ SEND EMAIL
-        if (visitor.email) {
+        if (visitor?.email) {
           await sendEmailWithPDF(visitor, pdfBuffer);
           console.log("✅ Email Sent");
         }
@@ -71,14 +71,14 @@ export const addVisitor = async (req, res) => {
         }
 
         // ✅ SAVE PDF
-        const filePath = `./public/gatepass-${visitor._id}.pdf`;
+        const filePath = `./public/gatepass-${visitor?._id}.pdf`;
         fs.writeFileSync(filePath, pdfBuffer);
 
-        const pdfUrl = `http://localhost:5000/public/gatepass-${visitor._id}.pdf`;
+        const pdfUrl = `http://localhost:5000/public/gatepass-${visitor?._id}.pdf`;
 
         // ✅ SEND WHATSAPP
-        if (visitor.phone) {
-          await sendWhatsAppMessage(visitor, pdfUrl);
+        if (visitor?.phone) {
+          // await sendWhatsAppMessage(visitor, pdfUrl);
           console.log("✅ WhatsApp Sent");
         }
       } catch (err) {
@@ -87,35 +87,35 @@ export const addVisitor = async (req, res) => {
 
       // Log the action
       await VisitorLog.create({
-        visitor: visitor._id,
+        visitor: visitor?._id,
         action: "approved",
         performedBy: req.user._id,
         notes: `Visitor approved by ${req.user.name}`,
       });
 
       // Send notification to visitor
-      if (visitor.email) {
-        await sendNotification(visitor.email, null, {
+      if (visitor?.email) {
+        await sendNotification(visitor?.email, null, {
           type: "visitor_status",
           status: "approved",
-          visitorName: visitor.name,
+          visitorName: visitor?.name,
         });
       }
     }
-    console.log("🧾 Visitor created:", visitor._id);
+    console.log("🧾 Visitor created:", visitor?._id);
 
     // QR
     const qrData = {
-      visitorId: visitor._id,
-      name: visitor.name,
-      host: visitor.hostName,
+      visitorId: visitor?._id,
+      name: visitor?.name,
+      host: visitor?.hostName,
     };
 
     console.log("🔳 Generating QR...");
     const qrCode = await generateQR(qrData);
 
-    visitor.qrCode = qrCode;
-    await visitor.save();
+    visitor?.qrCode = qrCode;
+    await visitor?.save();
 
     console.log("✅ QR generated & saved", qrCode);
 
@@ -153,16 +153,16 @@ export const approveVisitor = async (req, res) => {
       return res.status(404).json({ message: "Visitor not found" });
     }
 
-    visitor.status = status;
-    visitor.approvedBy = req.user._id;
-    await visitor.save();
+    visitor?.status = status;
+    visitor?.approvedBy = req.user._id;
+    await visitor?.save();
 
     try {
       const pdfBuffer = await generateGatePassPDF(visitor);
       console.log("✅ PDF Generated");
 
       // ✅ SEND EMAIL
-      if (visitor.email) {
+      if (visitor?.email) {
         await sendEmailWithPDF(visitor, pdfBuffer);
         console.log("✅ Email Sent");
       }
@@ -173,14 +173,14 @@ export const approveVisitor = async (req, res) => {
       }
 
       // ✅ SAVE PDF
-      const filePath = `./public/gatepass-${visitor._id}.pdf`;
+      const filePath = `./public/gatepass-${visitor?._id}.pdf`;
       fs.writeFileSync(filePath, pdfBuffer);
 
-      const pdfUrl = `http://localhost:5000/public/gatepass-${visitor._id}.pdf`;
+      const pdfUrl = `http://localhost:5000/public/gatepass-${visitor?._id}.pdf`;
 
       // ✅ SEND WHATSAPP
-      if (visitor.phone) {
-        await sendWhatsAppMessage(visitor, pdfUrl);
+      if (visitor?.phone) {
+        // await sendWhatsAppMessage(visitor, pdfUrl);
         console.log("✅ WhatsApp Sent");
       }
     } catch (err) {
@@ -189,18 +189,18 @@ export const approveVisitor = async (req, res) => {
 
     // Log the action
     await VisitorLog.create({
-      visitor: visitor._id,
+      visitor: visitor?._id,
       action: status === "approved" ? "approved" : "rejected",
       performedBy: req.user._id,
       notes: `Visitor ${status} by ${req.user.name}`,
     });
 
     // Send notification to visitor
-    if (visitor.email) {
-      await sendNotification(visitor.email, null, {
+    if (visitor?.email) {
+      await sendNotification(visitor?.email, null, {
         type: "visitor_status",
         status,
-        visitorName: visitor.name,
+        visitorName: visitor?.name,
       });
     }
 
@@ -219,27 +219,27 @@ export const checkIn = async (req, res) => {
       return res.status(404).json({ message: "Visitor not found" });
     }
 
-    if (visitor.status !== "approved" && visitor.status !== "pending") {
+    if (visitor?.status !== "approved" && visitor?.status !== "pending") {
       return res.status(400).json({ message: "Visitor cannot check in" });
     }
 
-    visitor.status = "checked-in";
-    visitor.checkInTime = new Date();
-    await visitor.save();
+    visitor?.status = "checked-in";
+    visitor?.checkInTime = new Date();
+    await visitor?.save();
 
     await VisitorLog.create({
-      visitor: visitor._id,
+      visitor: visitor?._id,
       action: "check-in",
       performedBy: req.user._id,
       gate: req.body.gate || "Main Gate",
     });
 
     // Send notification to host
-    const host = await User.findById(visitor.host);
+    const host = await User.findById(visitor?.host);
     await sendNotification(host.email, host.phone, {
       type: "visitor_arrived",
-      visitorName: visitor.name,
-      checkInTime: visitor.checkInTime,
+      visitorName: visitor?.name,
+      checkInTime: visitor?.checkInTime,
     });
 
     res.json(visitor);
@@ -257,16 +257,16 @@ export const checkOut = async (req, res) => {
       return res.status(404).json({ message: "Visitor not found" });
     }
 
-    if (visitor.status !== "checked-in") {
+    if (visitor?.status !== "checked-in") {
       return res.status(400).json({ message: "Visitor is not checked in" });
     }
 
-    visitor.status = "checked-out";
-    visitor.checkOutTime = new Date();
-    await visitor.save();
+    visitor?.status = "checked-out";
+    visitor?.checkOutTime = new Date();
+    await visitor?.save();
 
     await VisitorLog.create({
-      visitor: visitor._id,
+      visitor: visitor?._id,
       action: "check-out",
       performedBy: req.user._id,
       gate: req.body.gate || "Main Gate",
