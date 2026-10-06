@@ -74,7 +74,7 @@ export const addVisitor = async (req, res) => {
         const filePath = `./public/gatepass-${visitor?._id}.pdf`;
         fs.writeFileSync(filePath, pdfBuffer);
 
-        const pdfUrl = `http://localhost:5000/public/gatepass-${visitor?._id}.pdf`;
+        const pdfUrl = `${process.env.BASE_URL}/public/gatepass-${visitor?._id}.pdf`;
 
         // ✅ SEND WHATSAPP
         if (visitor?.phone) {
@@ -176,7 +176,7 @@ export const approveVisitor = async (req, res) => {
       const filePath = `./public/gatepass-${visitor?._id}.pdf`;
       fs.writeFileSync(filePath, pdfBuffer);
 
-      const pdfUrl = `http://localhost:5000/public/gatepass-${visitor?._id}.pdf`;
+      const pdfUrl = `${process.env.BASE_URL}/public/gatepass-${visitor?._id}.pdf`;
 
       // ✅ SEND WHATSAPP
       if (visitor?.phone) {
