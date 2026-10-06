@@ -23,7 +23,7 @@ const app = express();
 
 // Enable CORS for your React app
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'https://visitorease.vercel.app'], // Add your frontend URL here
   credentials: true,
 }));
 
