@@ -38,6 +38,9 @@ app.use('/api/visitors', visitorRoutes);
 app.use('/api/residents', residentRoutes);
 app.use('/api/guards', guardRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.get("/",(req,res)=>{
+  res.send("API is running");
+})
 
 // Error handler
 app.use((err, req, res, next) => {
