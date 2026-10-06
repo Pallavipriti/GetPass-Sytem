@@ -114,8 +114,8 @@ export const addVisitor = async (req, res) => {
     console.log("🔳 Generating QR...");
     const qrCode = await generateQR(qrData);
 
-    visitor?.qrCode = qrCode;
-    await visitor?.save();
+    visitor.qrCode = qrCode;
+    await visitor.save();
 
     console.log("✅ QR generated & saved", qrCode);
 
@@ -153,9 +153,9 @@ export const approveVisitor = async (req, res) => {
       return res.status(404).json({ message: "Visitor not found" });
     }
 
-    visitor?.status = status;
-    visitor?.approvedBy = req.user._id;
-    await visitor?.save();
+    visitor.status = status;
+    visitor.approvedBy = req.user._id;
+    await visitor.save();
 
     try {
       const pdfBuffer = await generateGatePassPDF(visitor);
@@ -223,9 +223,9 @@ export const checkIn = async (req, res) => {
       return res.status(400).json({ message: "Visitor cannot check in" });
     }
 
-    visitor?.status = "checked-in";
-    visitor?.checkInTime = new Date();
-    await visitor?.save();
+    visitor.status = "checked-in";
+    visitor.checkInTime = new Date();
+    await visitor.save();
 
     await VisitorLog.create({
       visitor: visitor?._id,
@@ -261,9 +261,9 @@ export const checkOut = async (req, res) => {
       return res.status(400).json({ message: "Visitor is not checked in" });
     }
 
-    visitor?.status = "checked-out";
-    visitor?.checkOutTime = new Date();
-    await visitor?.save();
+    visitor.status = "checked-out";
+    visitor.checkOutTime = new Date();
+    await visitor.save();
 
     await VisitorLog.create({
       visitor: visitor?._id,
