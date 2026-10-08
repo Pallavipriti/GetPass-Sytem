@@ -16,7 +16,10 @@ import visitorRoutes from './routes/visitorRoutes.js';
 import residentRoutes from './routes/residentRoutes.js';
 import guardRoutes from './routes/guardRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
-
+console.log("========== ENV CHECK ==========");
+console.log("MONGODB_URI exists:", !!process.env.MONGODB_URI);
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("===============================");
 connectDB();
 
 const app = express();
@@ -39,9 +42,7 @@ app.use('/api/visitors', visitorRoutes);
 app.use('/api/residents', residentRoutes);
 app.use('/api/guards', guardRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.get("/",(req,res)=>{
-  res.send("API is running");
-})
+
 
 // Error handler
 app.use((err, req, res, next) => {
